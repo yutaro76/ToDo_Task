@@ -36,7 +36,21 @@ const DrfApiFetch = () => {
       body: JSON.stringify(data)
     })
     .then(res => res.json())
-    .then(data => setTasks([...tasks, data]))
+    .then(data => {setTasks([...tasks, data]); setEditedTask({id:'', title:''})})
+  }
+
+  const editTask = (task) => {
+    fetch(`http://127.0.0.1:8000/api/tasks/${task.id}/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(task)
+    })
+    .then(res => res.json())
+    .then(updatedTask => {setTasks(tasks.map(task => (task.id === updatedTask.id ? updatedTask : task)));
+      setEditedTask({id:'', title:''})
+    })
   }
 
   const handleInputChange = () => evt => {
@@ -52,6 +66,9 @@ const DrfApiFetch = () => {
           tasks.map(task => <li key={task.id}>{task.title} {task.id}
           <button onClick={()=>deleteTask(task.id)}>
             <i className='fas fa-trash-alt'></i>
+          </button>
+          <button onClick={()=>setEditedTask(task)}>
+            <i className='fas fa-pen'></i>
           </button>
           </li>)
         }
@@ -70,7 +87,9 @@ const DrfApiFetch = () => {
       placeholder='New Task?'
       required/>
 
-      <button onClick={()=>newTask(editedTask)}>Create</button>
+      { editedTask.id?
+      <button onClick={()=>editTask(editedTask)}>Update</button> :
+      <button onClick={()=>newTask(editedTask)}>Create</button> }
       
     </div>
   )
