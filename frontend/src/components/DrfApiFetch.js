@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 const DrfApiFetch = () => {
 
@@ -19,11 +18,20 @@ const DrfApiFetch = () => {
     .then(data => {setSelected(data)})
   }
 
+  const deleteTask = (id) => {
+    fetch(`http://127.0.0.1:8000/api/tasks/${id}/`, {method: 'DELETE'})
+    .then(() => {setTasks(tasks.filter(task => task.id !== id)); setSelected([]); setId('')})
+  }
+
   return (
     <div>
       <ul>
         {
-          tasks.map(task => <li key={task.id}>{task.title} {task.id}</li>)
+          tasks.map(task => <li key={task.id}>{task.title} {task.id}
+          <button onClick={()=>deleteTask(task.id)}>
+            <i className='fas fa-trash-alt'></i>
+          </button>
+          </li>)
         }
       </ul>
 
@@ -31,6 +39,7 @@ const DrfApiFetch = () => {
       <input type='text' value={id} onChange={evt=>{setId(evt.target.value)}}/>
       <br/>
       <button type='button' onClick={()=>getTask()}>Get Task</button>
+      
       <h3>{selectedTask.title} {selectedTask.id}</h3>
       
     </div>
